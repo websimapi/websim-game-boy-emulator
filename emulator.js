@@ -4,12 +4,20 @@ class Emulator {
         this.memory = new Memory();
         this.cpu = new CPU(this.memory);
         this.gpu = new GPU(this.memory);
+        this.timer = new Timer(this.memory);
         this.input = new Input(this.memory);
         
         // Emulator state
         this.isRunning = false;
         this.animationFrameId = null;
         this.lastFrameTime = 0;
+        this.cyclesThisFrame = 0;
+        this.fps = 0;
+        this.fpsCounter = 0;
+        this.fpsTimer = 0;
+        
+        // Debug mode
+        this.debugMode = false;
         
         // Initialize ROM loading
         this.initRomLoading();
@@ -53,6 +61,7 @@ class Emulator {
     
     // Reset the emulator
     reset() {
+        this.stop();
         this.cpu.reset();
         this.gpu.clearScreen();
         
@@ -60,6 +69,14 @@ class Emulator {
         if (this.memory.bootRomActive) {
             this.gpu.renderNintendoLogo();
         }
+        
+        // Reset timers
+        this.cyclesThisFrame = 0;
+        this.fps = 0;
+        this.fpsCounter = 0;
+        this.fpsTimer = 0;
+        
+        this.start();
     }
     
     // Start the emulator
@@ -90,24 +107,40 @@ class Emulator {
         const deltaTime = timestamp - this.lastFrameTime;
         this.lastFrameTime = timestamp;
         
-        // Run CPU cycles
-        this.runFrame(deltaTime);
+        // Update FPS counter
+        this.fpsTimer += deltaTime;
+        this.fpsCounter++;
+        if (this.fpsTimer >= 1000) {
+            this.fps = this.fpsCounter;
+            this.fpsCounter = 0;
+            this.fpsTimer = 0;
+            
+            if (this.debugMode) {
+                console.log(`FPS: ${this.fps}`);
+            }
+        }
+        
+        // Run one frame of emulation
+        this.runFrame();
         
         // Request next frame
         this.animationFrameId = requestAnimationFrame(this.mainLoop.bind(this));
     }
     
     // Run a single frame of emulation
-    runFrame(deltaTime) {
+    runFrame() {
         // Game Boy runs at approximately 4.194304 MHz
         // At 60fps, each frame should execute around 70000 cycles
-        const cyclesPerFrame = 70000;
-        let cycles = 0;
+        const cyclesPerFrame = 70224; // Exact number of cycles per frame
+        this.cyclesThisFrame = 0;
         
-        while (cycles < cyclesPerFrame) {
+        while (this.cyclesThisFrame < cyclesPerFrame) {
             // Execute an instruction
             const instructionCycles = this.cpu.executeInstruction();
-            cycles += instructionCycles;
+            this.cyclesThisFrame += instructionCycles;
+            
+            // Update timers
+            this.timer.update(instructionCycles);
             
             // Update GPU
             this.gpu.step(instructionCycles);
@@ -119,7 +152,7 @@ class Emulator {
     
     // Handle CPU interrupts
     handleInterrupts() {
-        if (!this.cpu.interruptsEnabled) return;
+        if (!this.cpu.interruptsEnabled && !this.cpu.halted) return;
         
         // Check for interrupts
         const interruptFlag = this.memory.readByte(0xFF0F);
@@ -129,14 +162,16 @@ class Emulator {
             // At least one interrupt is pending and enabled
             this.cpu.halted = false;
             
-            // Process interrupts (VBlank, LCD, Timer, Serial, Joypad)
+            if (!this.cpu.interruptsEnabled) return;
+            
+            // Process interrupts in priority order (VBlank, LCD, Timer, Serial, Joypad)
             for (let i = 0; i < 5; i++) {
                 if ((interruptFlag & (1 << i)) && (interruptEnable & (1 << i))) {
                     // Service this interrupt
                     this.cpu.interruptsEnabled = false;
                     
                     // Push PC to stack
-                    this.cpu.registers.sp -= 2;
+                    this.cpu.registers.sp = (this.cpu.registers.sp - 2) & 0xFFFF;
                     this.memory.writeWord(this.cpu.registers.sp, this.cpu.registers.pc);
                     
                     // Jump to interrupt vector
@@ -155,10 +190,39 @@ class Emulator {
             }
         }
     }
+    
+    // Toggle debug mode
+    toggleDebug() {
+        this.debugMode = !this.debugMode;
+        notify(`Debug mode ${this.debugMode ? 'enabled' : 'disabled'}`);
+    }
 }
 
 // Start the emulator when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     const emulator = new Emulator();
+    
+    // Add keyboard shortcuts for emulator control
+    document.addEventListener('keydown', (e) => {
+        // Reset - R key
+        if (e.key === 'r') {
+            emulator.reset();
+        }
+        
+        // Pause/Resume - P key
+        if (e.key === 'p') {
+            if (emulator.isRunning) {
+                emulator.stop();
+                notify('Emulator paused');
+            } else {
+                emulator.start();
+                notify('Emulator resumed');
+            }
+        }
+        
+        // Debug mode toggle - D key
+        if (e.key === 'd') {
+            emulator.toggleDebug();
+        }
+    });
 });
-
