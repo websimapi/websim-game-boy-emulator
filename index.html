@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Boy Emulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="gameboy">
+        <div class="gameboy-screen-container">
+            <div class="screen-brand">
+                <span>Nintendo</span>
+                <span class="small">GAME BOY</span>
+                <span>™</span>
+            </div>
+            <div class="screen-power">
+                <div class="power-led"></div>
+                <span>BATTERY</span>
+            </div>
+            <canvas id="screen" width="160" height="144"></canvas>
+        </div>
+        <div class="gameboy-controls">
+            <div class="d-pad">
+                <button id="btn-up" class="btn-direction">⯅</button>
+                <button id="btn-left" class="btn-direction">⯇</button>
+                <button id="btn-center" class="btn-direction"></button>
+                <button id="btn-right" class="btn-direction">⯈</button>
+                <button id="btn-down" class="btn-direction">⯆</button>
+            </div>
+            <div class="action-buttons">
+                <button id="btn-b" class="btn-action">B</button>
+                <button id="btn-a" class="btn-action">A</button>
+            </div>
+            <div class="system-buttons">
+                <button id="btn-select" class="btn-system">SELECT</button>
+                <button id="btn-start" class="btn-system">START</button>
+            </div>
+        </div>
+        <div class="gameboy-speaker">
+            <div class="speaker-hole"></div>
+            <div class="speaker-hole"></div>
+            <div class="speaker-hole"></div>
+            <div class="speaker-hole"></div>
+            <div class="speaker-hole"></div>
+            <div class="speaker-hole"></div>
+        </div>
+    </div>
+    <div class="controls-info">
+        <h3>Controls:</h3>
+        <p>D-Pad: Arrow Keys</p>
+        <p>A: Z Key</p>
+        <p>B: X Key</p>
+        <p>Start: Enter Key</p>
+        <p>Select: Shift Key</p>
+        <button id="load-rom">Load ROM</button>
+    </div>
+
+    <script src="utils.js"></script>
+    <script src="memory.js"></script>
+    <script src="cpu.js"></script>
+    <script src="gpu.js"></script>
+    <script src="input.js"></script>
+    <script src="emulator.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
