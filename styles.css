@@ -15,6 +15,69 @@ body {
     background-color: #f0f0f0;
 }
 
+/* Start screen styles */
+#start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #9bbc0f;
+    z-index: 1000;
+}
+
+.start-content {
+    text-align: center;
+    padding: 40px;
+    background-color: #c4cfa1;
+    border-radius: 20px;
+    border: 8px solid #0f380f;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.gameboy-logo {
+    margin-bottom: 30px;
+}
+
+.emulator-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0f380f;
+    margin-top: 10px;
+}
+
+.instructions {
+    color: #0f380f;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+#start-button {
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #0f380f;
+    color: #9bbc0f;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#start-button:hover {
+    background-color: #306230;
+    transform: scale(1.05);
+}
+
+.emulator-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .gameboy {
     position: relative;
     width: 320px;
@@ -70,11 +133,56 @@ body {
     box-shadow: 0 0 5px #f00;
 }
 
-#screen {
+.screen-wrapper {
+    position: relative;
     width: 100%;
     height: 144px;
+}
+
+#screen {
+    width: 100%;
+    height: 100%;
     background-color: #9bbc0f;
     border: 2px solid #0f380f;
+}
+
+/* Magnify overlay */
+.magnify-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.magnify-overlay.active {
+    display: block;
+}
+
+#magnify-canvas {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 2px solid #0f380f;
+    background-color: rgba(0, 0, 0, 0.5);
+    image-rendering: pixelated;
+}
+
+.custom-cursor {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    border: 1px solid #fff;
+}
+
+.screen-wrapper.magnify-mode {
+    cursor: none;
 }
 
 .gameboy-controls {
@@ -228,4 +336,3 @@ body {
     transform: translateY(2px);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-

@@ -7,55 +7,86 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="gameboy">
-        <div class="gameboy-screen-container">
-            <div class="screen-brand">
-                <span>Nintendo</span>
-                <span class="small">GAME BOY</span>
-                <span>™</span>
+    <div id="start-screen">
+        <div class="start-content">
+            <div class="gameboy-logo">
+                <svg width="200" height="120" viewBox="0 0 200 120">
+                    <g fill="#0f380f">
+                        <path d="M20,20 h160 v80 h-160 z M30,30 v60 h140 v-60 z"/>
+                        <path d="M40,45 h30 v8 h-22 v8 h22 v8 h-30 z"/>
+                        <path d="M75,45 h8 v24 h-8 z"/>
+                        <path d="M90,45 h30 v8 h-22 v16 h22 v8 h-30 z"/>
+                        <path d="M130,45 h30 v24 h-8 v-16 h-14 v16 h-8 z"/>
+                    </g>
+                </svg>
+                <div class="emulator-title">GAME BOY EMULATOR</div>
             </div>
-            <div class="screen-power">
-                <div class="power-led"></div>
-                <span>BATTERY</span>
+            <div class="instructions">
+                <p>A simple Game Boy emulator running in your browser</p>
+                <p>Load a ROM file to play your favorite Game Boy games</p>
             </div>
-            <canvas id="screen" width="160" height="144"></canvas>
-        </div>
-        <div class="gameboy-controls">
-            <div class="d-pad">
-                <button id="btn-up" class="btn-direction">⯅</button>
-                <button id="btn-left" class="btn-direction">⯇</button>
-                <button id="btn-center" class="btn-direction"></button>
-                <button id="btn-right" class="btn-direction">⯈</button>
-                <button id="btn-down" class="btn-direction">⯆</button>
-            </div>
-            <div class="action-buttons">
-                <button id="btn-b" class="btn-action">B</button>
-                <button id="btn-a" class="btn-action">A</button>
-            </div>
-            <div class="system-buttons">
-                <button id="btn-select" class="btn-system">SELECT</button>
-                <button id="btn-start" class="btn-system">START</button>
-            </div>
-        </div>
-        <div class="gameboy-speaker">
-            <div class="speaker-hole"></div>
-            <div class="speaker-hole"></div>
-            <div class="speaker-hole"></div>
-            <div class="speaker-hole"></div>
-            <div class="speaker-hole"></div>
-            <div class="speaker-hole"></div>
+            <button id="start-button">START</button>
         </div>
     </div>
-    <div class="controls-info">
-        <h3>Controls:</h3>
-        <p>D-Pad: Arrow Keys</p>
-        <p>A: Z Key</p>
-        <p>B: X Key</p>
-        <p>Start: Enter Key</p>
-        <p>Select: Shift Key</p>
-        <p>Reset: R Key</p>
-        <p>Pause/Resume: P Key</p>
-        <button id="load-rom">Load ROM</button>
+
+    <div class="emulator-container" style="display: none;">
+        <div class="gameboy">
+            <div class="gameboy-screen-container">
+                <div class="screen-brand">
+                    <span>Nintendo</span>
+                    <span class="small">GAME BOY</span>
+                    <span>™</span>
+                </div>
+                <div class="screen-power">
+                    <div class="power-led"></div>
+                    <span>BATTERY</span>
+                </div>
+                <div class="screen-wrapper">
+                    <canvas id="screen" width="160" height="144"></canvas>
+                    <div id="magnify-overlay" class="magnify-overlay">
+                        <canvas id="magnify-canvas" width="80" height="80"></canvas>
+                        <div id="custom-cursor" class="custom-cursor"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameboy-controls">
+                <div class="d-pad">
+                    <button id="btn-up" class="btn-direction">⯅</button>
+                    <button id="btn-left" class="btn-direction">⯇</button>
+                    <button id="btn-center" class="btn-direction"></button>
+                    <button id="btn-right" class="btn-direction">⯈</button>
+                    <button id="btn-down" class="btn-direction">⯆</button>
+                </div>
+                <div class="action-buttons">
+                    <button id="btn-b" class="btn-action">B</button>
+                    <button id="btn-a" class="btn-action">A</button>
+                </div>
+                <div class="system-buttons">
+                    <button id="btn-select" class="btn-system">SELECT</button>
+                    <button id="btn-start" class="btn-system">START</button>
+                </div>
+            </div>
+            <div class="gameboy-speaker">
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+                <div class="speaker-hole"></div>
+            </div>
+        </div>
+        <div class="controls-info">
+            <h3>Controls:</h3>
+            <p>D-Pad: Arrow Keys</p>
+            <p>A: Z Key</p>
+            <p>B: X Key</p>
+            <p>Start: Enter Key</p>
+            <p>Select: Shift Key</p>
+            <p>Reset: R Key</p>
+            <p>Pause/Resume: P Key</p>
+            <p>Magnify Mode: M Key</p>
+            <button id="load-rom">Load ROM</button>
+        </div>
     </div>
 
     <script src="utils.js"></script>

@@ -22,9 +22,24 @@ class Emulator {
         // Initialize ROM loading
         this.initRomLoading();
         
-        // Reset CPU and start the emulator
-        this.reset();
-        this.start();
+        // Initialize start screen
+        this.initStartScreen();
+    }
+    
+    // Initialize start screen
+    initStartScreen() {
+        const startButton = document.getElementById('start-button');
+        const startScreen = document.getElementById('start-screen');
+        const emulatorContainer = document.querySelector('.emulator-container');
+        
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            emulatorContainer.style.display = 'flex';
+            
+            // Reset CPU and start the emulator
+            this.reset();
+            this.start();
+        });
     }
     
     // Initialize ROM loading button

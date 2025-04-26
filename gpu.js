@@ -48,11 +48,120 @@ class GPU {
         // Scanline buffer
         this.scanlineBuffer = new Uint8Array(this.width);
         
+        // Magnify mode
+        this.magnifyMode = false;
+        this.magnifyCanvas = document.getElementById('magnify-canvas');
+        this.magnifyCtx = this.magnifyCanvas.getContext('2d');
+        this.magnifyOverlay = document.getElementById('magnify-overlay');
+        this.customCursor = document.getElementById('custom-cursor');
+        this.screenWrapper = document.querySelector('.screen-wrapper');
+        this.magnifyZoom = 8;  // Magnification level
+        this.magnifySize = 10; // Size of magnification area in pixels
+        this.currentColor = [155, 188, 15, 255]; // Default color
+        
+        // Initialize magnify mode
+        this.initMagnifyMode();
+        
         // Clear screen
         this.clearScreen();
         
         // Update palette data
         this.updateBGPalette();
+    }
+    
+    // Initialize magnify mode
+    initMagnifyMode() {
+        // Handle mouse movement over the screen
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (!this.magnifyMode) return;
+            
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.width / rect.width;
+            const scaleY = this.height / rect.height;
+            
+            // Calculate pixel position on the original screen
+            const x = Math.floor((e.clientX - rect.left) * scaleX);
+            const y = Math.floor((e.clientY - rect.top) * scaleY);
+            
+            // Update magnify canvas position
+            this.magnifyCanvas.style.left = (e.clientX - rect.left - 40) + 'px';
+            this.magnifyCanvas.style.top = (e.clientY - rect.top - 40) + 'px';
+            
+            // Update cursor position
+            this.customCursor.style.left = (e.clientX - rect.left) + 'px';
+            this.customCursor.style.top = (e.clientY - rect.top) + 'px';
+            
+            // Get the color of the pixel under the cursor
+            const pixelIndex = (y * this.width + x) * 4;
+            if (pixelIndex >= 0 && pixelIndex < this.frameBuffer.length) {
+                this.currentColor = [
+                    this.frameBuffer[pixelIndex],
+                    this.frameBuffer[pixelIndex + 1],
+                    this.frameBuffer[pixelIndex + 2],
+                    this.frameBuffer[pixelIndex + 3]
+                ];
+                
+                // Update cursor color
+                this.customCursor.style.backgroundColor = `rgba(${this.currentColor[0]}, ${this.currentColor[1]}, ${this.currentColor[2]}, ${this.currentColor[3] / 255})`;
+            }
+            
+            // Render the magnified view
+            this.renderMagnifiedView(x, y);
+        });
+        
+        // Toggle magnify mode with M key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'm' || e.key === 'M') {
+                this.toggleMagnifyMode();
+            }
+        });
+    }
+    
+    // Toggle magnify mode
+    toggleMagnifyMode() {
+        this.magnifyMode = !this.magnifyMode;
+        
+        if (this.magnifyMode) {
+            this.magnifyOverlay.classList.add('active');
+            this.screenWrapper.classList.add('magnify-mode');
+        } else {
+            this.magnifyOverlay.classList.remove('active');
+            this.screenWrapper.classList.remove('magnify-mode');
+        }
+        
+        notify(`Magnify mode ${this.magnifyMode ? 'enabled' : 'disabled'}`);
+    }
+    
+    // Render magnified view
+    renderMagnifiedView(centerX, centerY) {
+        // Clear magnify canvas
+        this.magnifyCtx.clearRect(0, 0, this.magnifyCanvas.width, this.magnifyCanvas.height);
+        
+        // Calculate the area to magnify
+        const startX = Math.max(0, centerX - this.magnifySize / 2);
+        const startY = Math.max(0, centerY - this.magnifySize / 2);
+        const endX = Math.min(this.width, centerX + this.magnifySize / 2);
+        const endY = Math.min(this.height, centerY + this.magnifySize / 2);
+        
+        // Draw each pixel magnified
+        for (let y = startY; y < endY; y++) {
+            for (let x = startX; x < endX; x++) {
+                const pixelIndex = (y * this.width + x) * 4;
+                
+                const r = this.frameBuffer[pixelIndex];
+                const g = this.frameBuffer[pixelIndex + 1];
+                const b = this.frameBuffer[pixelIndex + 2];
+                const a = this.frameBuffer[pixelIndex + 3];
+                
+                this.magnifyCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+                this.magnifyCtx.fillRect(
+                    (x - startX) * this.magnifyZoom,
+                    (y - startY) * this.magnifyZoom,
+                    this.magnifyZoom,
+                    this.magnifyZoom
+                );
+            }
+        }
     }
     
     // Clone a palette
